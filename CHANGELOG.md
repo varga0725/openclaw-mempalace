@@ -15,4 +15,5 @@
 - operations and roadmap docs for official plugin direction
 - example cron and HEARTBEAT maintenance templates
 - shared runtime bridge module to isolate the Python subprocess boundary
+- adapter layer for recall and save operations, decoupling plugin logic from backend details
 - safety strategy doc for removing the unsafe-install blocker over time

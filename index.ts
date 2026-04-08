@@ -1,5 +1,6 @@
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { expandHomePath, runPythonJson } from "./lib/runtime-bridge.ts";
+import { createMempalaceAdapter } from "./lib/mempalace-adapter.ts";
+import { expandHomePath } from "./lib/runtime-bridge.ts";
 
 function pluginCfg(cfg: any) {
   return cfg?.plugins?.entries?.mempalace?.config || {};
@@ -70,51 +71,7 @@ function pickRoute(text: string, cfg: any) {
   };
 }
 
-const recallScript = `
-import sys, json
-from mempalace.searcher import search_memories
-payload = json.loads(sys.stdin.read())
-res = search_memories(payload['query'], palace_path=payload['palace_path'], n_results=payload['max_results'])
-print(json.dumps(res))
-`.trim();
-
-const saveScript = `
-import sys, json, hashlib
-from datetime import datetime
-import chromadb
-payload = json.loads(sys.stdin.read())
-client = chromadb.PersistentClient(path=payload['palace_path'])
-try:
-    col = client.get_collection('mempalace_drawers')
-except Exception:
-    col = client.create_collection('mempalace_drawers')
-content = payload['content']
-wing = payload['wing']
-room = payload['room']
-source_file = payload['source_file']
-content_hash = hashlib.md5(content.encode()).hexdigest()
-drawer_id = f"drawer_{wing}_{room}_{content_hash[:16]}"
-try:
-    existing = col.get(ids=[drawer_id])
-    if existing and existing.get('ids'):
-        print(json.dumps({'ok': True, 'duplicate': True}))
-        raise SystemExit(0)
-except Exception:
-    pass
-try:
-    col.add(documents=[content], ids=[drawer_id], metadatas=[{
-        'wing': wing,
-        'room': room,
-        'source_file': source_file,
-        'content_hash': content_hash,
-        'chunk_index': 0,
-        'added_by': 'openclaw-mempalace-plugin',
-        'filed_at': datetime.now().isoformat(),
-    }])
-except Exception:
-    pass
-print(json.dumps({'ok': True, 'duplicate': False}))
-`.trim();
+const adapter = createMempalaceAdapter();
 
 export default definePluginEntry({
   id: "mempalace",
@@ -130,10 +87,10 @@ export default definePluginEntry({
         const lastUser = [...(event?.messages || [])].reverse().find((m: any) => m?.role === "user");
         const query = extractText(lastUser);
         if (!query || query.trim().length < 4) return;
-        const result = await runPythonJson(recallScript, {
+        const result = await adapter.recall({
           query,
-          palace_path: palacePathFromConfig(cfg),
-          max_results: maxRecallResults,
+          palacePath: palacePathFromConfig(cfg),
+          maxResults: maxRecallResults,
         });
         const hits = result?.results || [];
         if (!hits.length) return;
@@ -158,11 +115,11 @@ export default definePluginEntry({
         if (text.length < 20) return;
         const route = pickRoute(text, cfg);
         const sourceKey = event?.sessionKey || event?.messageId || event?.context?.messageId || new Date().toISOString();
-        await runPythonJson(saveScript, {
-          palace_path: palacePathFromConfig(cfg),
+        await adapter.saveMessage({
+          palacePath: palacePathFromConfig(cfg),
           wing: route.wing,
           room: route.room,
-          source_file: `message-received:${sourceKey}`,
+          sourceFile: `message-received:${sourceKey}`,
           content: text,
         });
       } catch {

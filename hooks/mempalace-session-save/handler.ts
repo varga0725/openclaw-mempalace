@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
-import { expandHomePath, runPythonJson } from "../../lib/runtime-bridge.ts";
+import { createMempalaceAdapter } from "../../lib/mempalace-adapter.ts";
+import { expandHomePath } from "../../lib/runtime-bridge.ts";
 
 const log = {
   info: (...args: any[]) => console.log("[mempalace-session-save]", ...args),
@@ -44,67 +45,16 @@ async function getRecentSessionContent(sessionFilePath: string, messageCount = 1
   }
 }
 
+const adapter = createMempalaceAdapter();
+
 async function writeToMempalace(payload: Record<string, any>) {
-  const script = `
-import os, sys, json, hashlib
-from datetime import datetime
-import chromadb
-
-payload = json.loads(sys.stdin.read())
-palace_path = payload["palace_path"]
-wing = payload["wing"]
-room = payload["room"]
-source_file = payload["source_file"]
-content = payload["content"]
-chunk_size = 800
-overlap = 100
-min_chunk = 50
-
-client = chromadb.PersistentClient(path=palace_path)
-try:
-    col = client.get_collection("mempalace_drawers")
-except Exception:
-    col = client.create_collection("mempalace_drawers")
-
-start = 0
-idx = 0
-while start < len(content):
-    end = min(start + chunk_size, len(content))
-    chunk = content[start:end].strip()
-    if len(chunk) >= min_chunk:
-        chunk_hash = hashlib.md5(chunk.encode()).hexdigest()
-        drawer_id = f"drawer_{wing}_{room}_{idx}_{chunk_hash[:16]}"
-        try:
-            existing = col.get(ids=[drawer_id])
-            if existing and existing.get("ids"):
-                start = end - overlap if end < len(content) else end
-                idx += 1
-                continue
-        except Exception:
-            pass
-        try:
-            col.add(
-                documents=[chunk],
-                ids=[drawer_id],
-                metadatas=[{
-                    "wing": wing,
-                    "room": room,
-                    "source_file": source_file,
-                    "content_hash": chunk_hash,
-                    "chunk_index": idx,
-                    "added_by": "openclaw-hook",
-                    "filed_at": datetime.now().isoformat(),
-                }],
-            )
-        except Exception:
-            pass
-        idx += 1
-    start = end - overlap if end < len(content) else end
-
-print(json.dumps({"ok": True, "chunks": idx}))
-`.trim();
-
-  return await runPythonJson(script, payload);
+  return await adapter.saveSessionSnapshot({
+    palacePath: payload.palace_path,
+    wing: payload.wing,
+    room: payload.room,
+    sourceFile: payload.source_file,
+    content: payload.content,
+  });
 }
 
 export default async function handler(event: any) {
