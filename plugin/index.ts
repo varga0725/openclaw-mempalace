@@ -30,6 +30,10 @@ function pluginCfg(cfg: any) {
   return cfg?.plugins?.entries?.mempalace?.config || {};
 }
 
+function pluginEnabled(cfg: any) {
+  return cfg?.plugins?.entries?.mempalace?.enabled !== false;
+}
+
 function palacePathFromConfig(cfg: any) {
   return pluginCfg(cfg).palacePath || path.join(os.homedir(), ".mempalace", "palace");
 }
@@ -38,8 +42,41 @@ function extractText(message: any): string {
   const content = message?.content;
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
-    return content.filter((c: any) => c?.type === "text").map((c: any) => c.text || "").join("\n");
+    return content
+      .filter((c: any) => c?.type === "text")
+      .map((c: any) => c.text || "")
+      .join("\n");
   }
+  return "";
+}
+
+function extractInboundText(event: any): string {
+  const candidates = [
+    event?.context?.content,
+    event?.context?.bodyForAgent,
+    event?.context?.transcript,
+    event?.context?.text,
+    event?.message?.content,
+    event?.payload?.content,
+    event?.payload?.text,
+    event?.body,
+    event?.text,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+    if (Array.isArray(candidate)) {
+      const text = candidate
+        .filter((item: any) => item?.type === "text" && typeof item?.text === "string")
+        .map((item: any) => item.text.trim())
+        .filter(Boolean)
+        .join("\n");
+      if (text) return text;
+    }
+  }
+
   return "";
 }
 
@@ -103,6 +140,7 @@ export default definePluginEntry({
     api.registerHook("before_prompt_build", async (event: any) => {
       try {
         const cfg = event?.cfg || {};
+        if (!pluginEnabled(cfg)) return;
         const pcfg = pluginCfg(cfg);
         const maxRecallResults = Number(pcfg.maxRecallResults) > 0 ? Number(pcfg.maxRecallResults) : 5;
         const lastUser = [...(event?.messages || [])].reverse().find((m: any) => m?.role === "user");
@@ -128,17 +166,19 @@ export default definePluginEntry({
     api.registerHook("message_received", async (event: any) => {
       try {
         const cfg = event?.cfg || {};
+        if (!pluginEnabled(cfg)) return;
         const pcfg = pluginCfg(cfg);
         const scope = pcfg.captureChannelScope || "direct-only";
         if (scope === "direct-only" && event?.kind && event.kind !== "direct") return;
-        const text = String(event?.context?.content || event?.context?.bodyForAgent || event?.context?.transcript || "").trim();
+        const text = extractInboundText(event);
         if (text.length < 20) return;
         const route = pickRoute(text, cfg);
+        const sourceKey = event?.sessionKey || event?.messageId || event?.context?.messageId || new Date().toISOString();
         await runPython(saveScript, {
           palace_path: palacePathFromConfig(cfg),
           wing: route.wing,
           room: route.room,
-          source_file: `message-received:${new Date().toISOString()}`,
+          source_file: `message-received:${sourceKey}`,
           content: text,
         });
       } catch {

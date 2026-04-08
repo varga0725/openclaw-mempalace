@@ -22,6 +22,12 @@ Still needs hardening:
 - stronger relevance filtering
 - better packaging and install ergonomics
 
+Recent improvements already in tree:
+- plugin-level `enabled` guard
+- hook-level `enabled` guard
+- hook `palacePath` override support via config
+- broader inbound text extraction for `message_received`
+
 ## Layout
 
 - `plugin/` - OpenClaw plugin entry, manifest, and package metadata

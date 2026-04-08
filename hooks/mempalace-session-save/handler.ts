@@ -12,8 +12,13 @@ function resolveHookConfig(cfg: any) {
   return cfg?.hooks?.internal?.entries?.["mempalace-session-save"] || {};
 }
 
-function resolvePalacePath() {
-  return process.env.MEMPALACE_PALACE_PATH || path.join(os.homedir(), ".mempalace", "palace");
+function hookEnabled(cfg: any) {
+  return resolveHookConfig(cfg).enabled !== false;
+}
+
+function resolvePalacePath(cfg: any) {
+  const hookConfig = resolveHookConfig(cfg);
+  return hookConfig.palacePath || process.env.MEMPALACE_PALACE_PATH || path.join(os.homedir(), ".mempalace", "palace");
 }
 
 async function getRecentSessionContent(sessionFilePath: string, messageCount = 15) {
@@ -122,6 +127,7 @@ export default async function handler(event: any) {
   try {
     const context = event.context || {};
     const cfg = context.cfg || {};
+    if (!hookEnabled(cfg)) return;
     const hookConfig = resolveHookConfig(cfg);
     const messages = Number(hookConfig.messages) > 0 ? Number(hookConfig.messages) : 15;
     const wing = hookConfig.wing || "openclaw_sessions";
@@ -146,7 +152,7 @@ export default async function handler(event: any) {
     const content = `# OpenClaw session snapshot\n\n- session_id: ${sessionId}\n- session_key: ${event.sessionKey || "unknown"}\n- action: ${event.action}\n- timestamp: ${now}\n\n## Transcript\n\n${transcript}`;
 
     const result = await writeToMempalace({
-      palace_path: resolvePalacePath(),
+      palace_path: resolvePalacePath(cfg),
       wing,
       room,
       source_file: sourceFile,

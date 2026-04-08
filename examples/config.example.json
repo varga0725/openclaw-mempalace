@@ -33,7 +33,8 @@
           "path": "/absolute/path/to/openclaw-mempalace/hooks/mempalace-session-save",
           "messages": 15,
           "wing": "openclaw_sessions",
-          "room": "session_memory"
+          "room": "session_memory",
+          "palacePath": "~/.mempalace/palace"
         }
       }
     }
