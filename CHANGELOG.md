@@ -14,3 +14,5 @@
 - verification doc covering current unsafe-install blocker from Python subprocess bridging
 - operations and roadmap docs for official plugin direction
 - example cron and HEARTBEAT maintenance templates
+- shared runtime bridge module to isolate the Python subprocess boundary
+- safety strategy doc for removing the unsafe-install blocker over time

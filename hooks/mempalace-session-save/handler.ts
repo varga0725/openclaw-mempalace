@@ -1,7 +1,5 @@
-import path from "node:path";
-import os from "node:os";
 import fs from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { expandHomePath, runPythonJson } from "../../lib/runtime-bridge.ts";
 
 const log = {
   info: (...args: any[]) => console.log("[mempalace-session-save]", ...args),
@@ -16,16 +14,9 @@ function hookEnabled(cfg: any) {
   return resolveHookConfig(cfg).enabled !== false;
 }
 
-function expandHomePath(inputPath?: string) {
-  if (!inputPath) return path.join(os.homedir(), ".mempalace", "palace");
-  if (inputPath === "~") return os.homedir();
-  if (inputPath.startsWith("~/")) return path.join(os.homedir(), inputPath.slice(2));
-  return inputPath;
-}
-
 function resolvePalacePath(cfg: any) {
   const hookConfig = resolveHookConfig(cfg);
-  return expandHomePath(hookConfig.palacePath || process.env.MEMPALACE_PALACE_PATH || path.join(os.homedir(), ".mempalace", "palace"));
+  return expandHomePath(hookConfig.palacePath || process.env.MEMPALACE_PALACE_PATH);
 }
 
 async function getRecentSessionContent(sessionFilePath: string, messageCount = 15) {
@@ -113,28 +104,7 @@ while start < len(content):
 print(json.dumps({"ok": True, "chunks": idx}))
 `.trim();
 
-  return await new Promise<{ ok: boolean; chunks?: number; error?: string }>((resolve) => {
-    const child = spawn("python3", ["-c", script], { stdio: ["pipe", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-
-    child.stdout.on("data", (d) => (stdout += String(d)));
-    child.stderr.on("data", (d) => (stderr += String(d)));
-    child.on("close", (code) => {
-      if (code === 0) {
-        try {
-          resolve(JSON.parse(stdout || "{}"));
-        } catch {
-          resolve({ ok: true });
-        }
-      } else {
-        resolve({ ok: false, error: stderr || `python exited ${code}` });
-      }
-    });
-
-    child.stdin.write(JSON.stringify(payload));
-    child.stdin.end();
-  });
+  return await runPythonJson(script, payload);
 }
 
 export default async function handler(event: any) {

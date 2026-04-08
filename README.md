@@ -57,6 +57,7 @@ See `examples/config.example.json`.
 
 See `docs/install.md` for local installation and config.
 See `docs/verification.md` for smoke tests and the current unsafe-install caveat caused by the Python bridge.
+See `docs/safety.md` for the bridge-isolation and migration strategy.
 
 ## Development notes
 

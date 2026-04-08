@@ -1,30 +1,5 @@
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { spawn } from "node:child_process";
-import path from "node:path";
-import os from "node:os";
-
-function runPython(script: string, payload: any): Promise<any> {
-  return new Promise((resolve) => {
-    const child = spawn("python3", ["-c", script], { stdio: ["pipe", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (d) => (stdout += String(d)));
-    child.stderr.on("data", (d) => (stderr += String(d)));
-    child.on("close", (code) => {
-      if (code === 0) {
-        try {
-          resolve(JSON.parse(stdout || "{}"));
-        } catch {
-          resolve({ ok: true, raw: stdout });
-        }
-      } else {
-        resolve({ ok: false, error: stderr || `python exited ${code}` });
-      }
-    });
-    child.stdin.write(JSON.stringify(payload));
-    child.stdin.end();
-  });
-}
+import { expandHomePath, runPythonJson } from "./lib/runtime-bridge.ts";
 
 function pluginCfg(cfg: any) {
   return cfg?.plugins?.entries?.mempalace?.config || {};
@@ -32,13 +7,6 @@ function pluginCfg(cfg: any) {
 
 function pluginEnabled(cfg: any) {
   return cfg?.plugins?.entries?.mempalace?.enabled !== false;
-}
-
-function expandHomePath(inputPath?: string) {
-  if (!inputPath) return path.join(os.homedir(), ".mempalace", "palace");
-  if (inputPath === "~") return os.homedir();
-  if (inputPath.startsWith("~/")) return path.join(os.homedir(), inputPath.slice(2));
-  return inputPath;
 }
 
 function palacePathFromConfig(cfg: any) {
@@ -162,7 +130,7 @@ export default definePluginEntry({
         const lastUser = [...(event?.messages || [])].reverse().find((m: any) => m?.role === "user");
         const query = extractText(lastUser);
         if (!query || query.trim().length < 4) return;
-        const result = await runPython(recallScript, {
+        const result = await runPythonJson(recallScript, {
           query,
           palace_path: palacePathFromConfig(cfg),
           max_results: maxRecallResults,
@@ -190,7 +158,7 @@ export default definePluginEntry({
         if (text.length < 20) return;
         const route = pickRoute(text, cfg);
         const sourceKey = event?.sessionKey || event?.messageId || event?.context?.messageId || new Date().toISOString();
-        await runPython(saveScript, {
+        await runPythonJson(saveScript, {
           palace_path: palacePathFromConfig(cfg),
           wing: route.wing,
           room: route.room,

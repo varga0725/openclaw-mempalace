@@ -22,7 +22,7 @@ Still blocking official-grade adoption:
 ## Milestones
 
 ### M1. Safe installation path
-- remove or encapsulate `child_process` usage
+- isolate `child_process` usage behind one shared bridge module
 - replace Python bridge with a safer adapter pattern
 - make default `openclaw plugins install` succeed without unsafe override
 
