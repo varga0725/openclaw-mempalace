@@ -1,0 +1,18 @@
+{
+  "name": "mempalace-daily-maintenance",
+  "schedule": {
+    "kind": "cron",
+    "expr": "15 21 * * *",
+    "tz": "Europe/Budapest"
+  },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Review recent memory-related activity for the day. Check whether there are memory files or notes that should be curated, whether MemPalace maintenance is needed, and whether any obvious duplicate or stale-memory issue should be surfaced. Do not invent content. Summarize concrete maintenance actions only.",
+    "timeoutSeconds": 300,
+    "lightContext": true
+  },
+  "delivery": {
+    "mode": "announce"
+  }
+}
