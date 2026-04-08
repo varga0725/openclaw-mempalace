@@ -1,75 +1,46 @@
 # openclaw-mempalace
 
-MemPalace integration for OpenClaw.
+> Development has moved to **`varga0725/mempalace-openclaw`**.
 
-This repo packages two related pieces:
-- a native OpenClaw plugin at the repository root for MemPalace-based recall and inbound memory capture
-- an internal hook that snapshots recent session context into MemPalace on `/new` and `/reset`
+This repository should now be treated as a **historical integration staging repo**, not the main source of truth.
+
+## Canonical repo
+
+Use this repo instead:
+
+- `varga0725/mempalace-openclaw`
+
+That repo now contains:
+- the MemPalace core
+- the benchmarks and tests
+- the OpenClaw integration under `integrations/openclaw/`
+
+## What this repo is now
+
+This repo can be archived after any still-useful docs or examples are copied over.
+
+Until then, keep it only as:
+- a reference snapshot of the earlier standalone OpenClaw integration work
+- a place to compare old plugin structure against the consolidated repo
+
+## Migration note
+
+The OpenClaw integration now lives in the canonical repo here:
+
+```text
+integrations/openclaw/
+├── README.md
+├── plugin/
+│   └── openclaw-mempalace-plugin.ts
+└── docs/
+    ├── architecture.md
+    ├── install.md
+    └── verification.md
+```
 
 ## Status
 
-Prototype, but already usable.
-
-Implemented:
-- prompt-time MemPalace recall
-- inbound message capture into MemPalace
-- configurable wing/room routing rules
-- session snapshot hook for `/new` and `/reset`
-
-Still needs hardening:
-- exact hook event validation across more OpenClaw scenarios
-- duplicate handling improvements
-- stronger relevance filtering
-- better packaging and install ergonomics
-
-Recent improvements already in tree:
-- plugin-level `enabled` guard
-- hook-level `enabled` guard
-- hook `palacePath` override support via config
-- broader inbound text extraction for `message_received`
-
-## Layout
-
-- `index.ts` + `openclaw.plugin.json` - native OpenClaw plugin root
-- `hooks/mempalace-session-save/` - internal hook for session snapshot saving
-- `docs/architecture.md` - high-level design notes
-- `docs/install.md` - install and config guide
-- `docs/verification.md` - verification notes and current install-status caveats
-- `docs/operations.md` - plugin vs hook vs heartbeat vs cron responsibilities
-- `docs/roadmap.md` - path from prototype to official quality
-- `docs/safety.md` - bridge-isolation and install-safety strategy
-- `docs/adapter.md` - adapter/backend abstraction notes
-- `docs/backends.md` - backend selection and future transport direction
-- `examples/config.example.json` - sample OpenClaw config
-- `examples/cron.memory-maintenance.example.json` - sample maintenance cron job
-- `examples/HEARTBEAT.memory-maintenance.example.md` - sample heartbeat maintenance guidance
-
-## Requirements
-
-- OpenClaw
-- Python 3
-- `chromadb`
-- the MemPalace Python package and search API available in the runtime
-- a writable palace path, defaulting to `~/.mempalace/palace`
-
-## Example config
-
-See `examples/config.example.json`.
-
-## Install
-
-See `docs/install.md` for local installation and config.
-See `docs/verification.md` for smoke tests and the current unsafe-install caveat caused by the Python bridge.
-See `docs/safety.md` for the bridge-isolation and migration strategy.
-See `docs/adapter.md` for the replacement seam between plugin behavior and backend implementation.
-
-## Development notes
-
-This implementation uses Python subprocess bridges instead of a direct Node adapter. That keeps the integration simple and portable, but it is not the final ideal architecture.
-
-## Changelog
-
-See `CHANGELOG.md`.
+**Moved. Prefer the consolidated repo for all new work.**
 
 ## License
 
