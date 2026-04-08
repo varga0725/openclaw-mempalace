@@ -1,0 +1,12 @@
+{
+  "name": "openclaw-mempalace",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "MemPalace integration for OpenClaw",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varga0725/openclaw-mempalace.git"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "mempalace",
+  "name": "MemPalace OpenClaw Integration",
+  "description": "Generic MemPalace recall and relevance-based memory capture for OpenClaw",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": { "type": "boolean" },
+      "palacePath": { "type": "string" },
+      "maxRecallResults": { "type": "number" },
+      "captureChannelScope": { "type": "string" },
+      "defaultWing": { "type": "string" },
+      "defaultRoom": { "type": "string" },
+      "routingRules": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "matchAny": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "wing": { "type": "string" },
+            "room": { "type": "string" }
+          },
+          "required": ["matchAny", "wing", "room"]
+        }
+      }
+    }
+  }
+}

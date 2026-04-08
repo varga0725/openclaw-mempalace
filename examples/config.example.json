@@ -1,0 +1,41 @@
+{
+  "plugins": {
+    "load": {
+      "paths": [
+        "/absolute/path/to/openclaw-mempalace/plugin"
+      ]
+    },
+    "entries": {
+      "mempalace": {
+        "enabled": true,
+        "config": {
+          "palacePath": "~/.mempalace/palace",
+          "maxRecallResults": 5,
+          "captureChannelScope": "direct-only",
+          "defaultWing": "workspace",
+          "defaultRoom": "memory",
+          "routingRules": [
+            {
+              "matchAny": ["trade", "setup", "token"],
+              "wing": "trading_system",
+              "room": "memory"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "hooks": {
+    "internal": {
+      "entries": {
+        "mempalace-session-save": {
+          "enabled": true,
+          "path": "/absolute/path/to/openclaw-mempalace/hooks/mempalace-session-save",
+          "messages": 15,
+          "wing": "openclaw_sessions",
+          "room": "session_memory"
+        }
+      }
+    }
+  }
+}
