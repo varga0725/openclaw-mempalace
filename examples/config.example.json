@@ -12,6 +12,7 @@
           "palacePath": "~/.mempalace/palace",
           "maxRecallResults": 5,
           "captureChannelScope": "direct-only",
+          "backend": "python-bridge",
           "defaultWing": "workspace",
           "defaultRoom": "memory",
           "routingRules": [
@@ -32,6 +33,7 @@
           "enabled": true,
           "path": "/absolute/path/to/openclaw-mempalace/hooks/mempalace-session-save",
           "messages": 15,
+          "backend": "python-bridge",
           "wing": "openclaw_sessions",
           "room": "session_memory",
           "palacePath": "~/.mempalace/palace"

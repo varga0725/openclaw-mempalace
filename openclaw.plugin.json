@@ -24,6 +24,11 @@
     },
     "defaultRoom": {
       "label": "Default room"
+    },
+    "backend": {
+      "label": "Backend",
+      "help": "Selects which MemPalace backend implementation the plugin should use",
+      "advanced": true
     }
   },
   "configSchema": {
@@ -39,6 +44,10 @@
       },
       "defaultWing": { "type": "string", "minLength": 1 },
       "defaultRoom": { "type": "string", "minLength": 1 },
+      "backend": {
+        "type": "string",
+        "enum": ["python-bridge", "http", "mcp"]
+      },
       "routingRules": {
         "type": "array",
         "items": {

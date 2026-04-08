@@ -16,4 +16,5 @@
 - example cron and HEARTBEAT maintenance templates
 - shared runtime bridge module to isolate the Python subprocess boundary
 - adapter layer for recall and save operations, decoupling plugin logic from backend details
+- backend selector groundwork for `python-bridge`, `http`, and `mcp`
 - safety strategy doc for removing the unsafe-install blocker over time

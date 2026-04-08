@@ -1,5 +1,6 @@
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { createMempalaceAdapter } from "./lib/mempalace-adapter.ts";
+import { type MempalaceBackendKind } from "./lib/mempalace-backends.ts";
 import { expandHomePath } from "./lib/runtime-bridge.ts";
 
 function pluginCfg(cfg: any) {
@@ -12,6 +13,12 @@ function pluginEnabled(cfg: any) {
 
 function palacePathFromConfig(cfg: any) {
   return expandHomePath(pluginCfg(cfg).palacePath);
+}
+
+function backendFromConfig(cfg: any): MempalaceBackendKind {
+  const backend = pluginCfg(cfg).backend;
+  if (backend === "http" || backend === "mcp") return backend;
+  return "python-bridge";
 }
 
 function extractText(message: any): string {
@@ -71,8 +78,6 @@ function pickRoute(text: string, cfg: any) {
   };
 }
 
-const adapter = createMempalaceAdapter();
-
 export default definePluginEntry({
   id: "mempalace",
   name: "MemPalace OpenClaw Integration",
@@ -83,6 +88,7 @@ export default definePluginEntry({
         const cfg = event?.cfg || {};
         if (!pluginEnabled(cfg)) return;
         const pcfg = pluginCfg(cfg);
+        const adapter = createMempalaceAdapter(backendFromConfig(cfg));
         const maxRecallResults = Number(pcfg.maxRecallResults) > 0 ? Number(pcfg.maxRecallResults) : 5;
         const lastUser = [...(event?.messages || [])].reverse().find((m: any) => m?.role === "user");
         const query = extractText(lastUser);
@@ -113,6 +119,7 @@ export default definePluginEntry({
         if (scope === "direct-only" && event?.kind && event.kind !== "direct") return;
         const text = extractInboundText(event);
         if (text.length < 20) return;
+        const adapter = createMempalaceAdapter(backendFromConfig(cfg));
         const route = pickRoute(text, cfg);
         const sourceKey = event?.sessionKey || event?.messageId || event?.context?.messageId || new Date().toISOString();
         await adapter.saveMessage({

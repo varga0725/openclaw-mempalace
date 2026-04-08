@@ -39,12 +39,15 @@ without rewriting the plugin and hook behavior again.
 Right now `createMempalaceAdapter()` returns a Python-bridge-backed implementation.
 That means the unsafe-install problem still exists, but the replacement path is now much cleaner.
 
-## Next target
+## Backend selection
 
-Make `createMempalaceAdapter()` switchable by backend, for example:
+`createMempalaceAdapter()` is now switchable by backend id:
 - `python-bridge`
 - `http`
 - `mcp`
-- `direct-js`
 
-Once that exists, the bridge can stop being the only implementation.
+Right now only `python-bridge` is implemented. The others intentionally return structured not-implemented errors.
+
+## Next target
+
+Add a second real backend implementation so the bridge stops being the only working path.

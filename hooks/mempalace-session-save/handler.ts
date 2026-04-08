@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import { createMempalaceAdapter } from "../../lib/mempalace-adapter.ts";
+import { type MempalaceBackendKind } from "../../lib/mempalace-backends.ts";
 import { expandHomePath } from "../../lib/runtime-bridge.ts";
 
 const log = {
@@ -18,6 +19,12 @@ function hookEnabled(cfg: any) {
 function resolvePalacePath(cfg: any) {
   const hookConfig = resolveHookConfig(cfg);
   return expandHomePath(hookConfig.palacePath || process.env.MEMPALACE_PALACE_PATH);
+}
+
+function backendFromHookConfig(cfg: any): MempalaceBackendKind {
+  const backend = resolveHookConfig(cfg).backend;
+  if (backend === "http" || backend === "mcp") return backend;
+  return "python-bridge";
 }
 
 async function getRecentSessionContent(sessionFilePath: string, messageCount = 15) {
@@ -45,9 +52,8 @@ async function getRecentSessionContent(sessionFilePath: string, messageCount = 1
   }
 }
 
-const adapter = createMempalaceAdapter();
-
-async function writeToMempalace(payload: Record<string, any>) {
+async function writeToMempalace(payload: Record<string, any>, backend: MempalaceBackendKind) {
+  const adapter = createMempalaceAdapter(backend);
   return await adapter.saveSessionSnapshot({
     palacePath: payload.palace_path,
     wing: payload.wing,
@@ -94,7 +100,7 @@ export default async function handler(event: any) {
       room,
       source_file: sourceFile,
       content,
-    });
+    }, backendFromHookConfig(cfg));
 
     if (!result.ok) {
       throw new Error(result.error || "unknown mempalace write failure");

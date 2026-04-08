@@ -37,6 +37,9 @@ Recent improvements already in tree:
 - `docs/verification.md` - verification notes and current install-status caveats
 - `docs/operations.md` - plugin vs hook vs heartbeat vs cron responsibilities
 - `docs/roadmap.md` - path from prototype to official quality
+- `docs/safety.md` - bridge-isolation and install-safety strategy
+- `docs/adapter.md` - adapter/backend abstraction notes
+- `docs/backends.md` - backend selection and future transport direction
 - `examples/config.example.json` - sample OpenClaw config
 - `examples/cron.memory-maintenance.example.json` - sample maintenance cron job
 - `examples/HEARTBEAT.memory-maintenance.example.md` - sample heartbeat maintenance guidance
