@@ -7,3 +7,6 @@
 - inbound message capture into MemPalace
 - `/new` and `/reset` session snapshot hook
 - initial hardening for config guards and palacePath overrides
+- official packaging prep: richer manifest, install docs, changelog
+- home-path expansion for palace paths like `~/.mempalace/palace`
+- first-pass duplicate suppression for plugin saves and session snapshot chunks

@@ -16,9 +16,16 @@ function hookEnabled(cfg: any) {
   return resolveHookConfig(cfg).enabled !== false;
 }
 
+function expandHomePath(inputPath?: string) {
+  if (!inputPath) return path.join(os.homedir(), ".mempalace", "palace");
+  if (inputPath === "~") return os.homedir();
+  if (inputPath.startsWith("~/")) return path.join(os.homedir(), inputPath.slice(2));
+  return inputPath;
+}
+
 function resolvePalacePath(cfg: any) {
   const hookConfig = resolveHookConfig(cfg);
-  return hookConfig.palacePath || process.env.MEMPALACE_PALACE_PATH || path.join(os.homedir(), ".mempalace", "palace");
+  return expandHomePath(hookConfig.palacePath || process.env.MEMPALACE_PALACE_PATH || path.join(os.homedir(), ".mempalace", "palace"));
 }
 
 async function getRecentSessionContent(sessionFilePath: string, messageCount = 15) {
@@ -74,7 +81,16 @@ while start < len(content):
     end = min(start + chunk_size, len(content))
     chunk = content[start:end].strip()
     if len(chunk) >= min_chunk:
-        drawer_id = f"drawer_{wing}_{room}_{hashlib.md5((source_file + str(idx) + chunk[:80]).encode()).hexdigest()[:16]}"
+        chunk_hash = hashlib.md5(chunk.encode()).hexdigest()
+        drawer_id = f"drawer_{wing}_{room}_{idx}_{chunk_hash[:16]}"
+        try:
+            existing = col.get(ids=[drawer_id])
+            if existing and existing.get("ids"):
+                start = end - overlap if end < len(content) else end
+                idx += 1
+                continue
+        except Exception:
+            pass
         try:
             col.add(
                 documents=[chunk],
@@ -83,6 +99,7 @@ while start < len(content):
                     "wing": wing,
                     "room": room,
                     "source_file": source_file,
+                    "content_hash": chunk_hash,
                     "chunk_index": idx,
                     "added_by": "openclaw-hook",
                     "filed_at": datetime.now().isoformat(),

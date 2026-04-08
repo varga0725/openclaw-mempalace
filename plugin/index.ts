@@ -34,8 +34,15 @@ function pluginEnabled(cfg: any) {
   return cfg?.plugins?.entries?.mempalace?.enabled !== false;
 }
 
+function expandHomePath(inputPath?: string) {
+  if (!inputPath) return path.join(os.homedir(), ".mempalace", "palace");
+  if (inputPath === "~") return os.homedir();
+  if (inputPath.startsWith("~/")) return path.join(os.homedir(), inputPath.slice(2));
+  return inputPath;
+}
+
 function palacePathFromConfig(cfg: any) {
-  return pluginCfg(cfg).palacePath || path.join(os.homedir(), ".mempalace", "palace");
+  return expandHomePath(pluginCfg(cfg).palacePath);
 }
 
 function extractText(message: any): string {
@@ -117,19 +124,28 @@ content = payload['content']
 wing = payload['wing']
 room = payload['room']
 source_file = payload['source_file']
-drawer_id = f"drawer_{wing}_{room}_{hashlib.md5((source_file + content[:80]).encode()).hexdigest()[:16]}"
+content_hash = hashlib.md5(content.encode()).hexdigest()
+drawer_id = f"drawer_{wing}_{room}_{content_hash[:16]}"
+try:
+    existing = col.get(ids=[drawer_id])
+    if existing and existing.get('ids'):
+        print(json.dumps({'ok': True, 'duplicate': True}))
+        raise SystemExit(0)
+except Exception:
+    pass
 try:
     col.add(documents=[content], ids=[drawer_id], metadatas=[{
         'wing': wing,
         'room': room,
         'source_file': source_file,
+        'content_hash': content_hash,
         'chunk_index': 0,
         'added_by': 'openclaw-mempalace-plugin',
         'filed_at': datetime.now().isoformat(),
     }])
 except Exception:
     pass
-print(json.dumps({'ok': True}))
+print(json.dumps({'ok': True, 'duplicate': False}))
 `.trim();
 
 export default definePluginEntry({
