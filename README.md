@@ -33,6 +33,7 @@ Recent improvements already in tree:
 - `plugin/` - OpenClaw plugin entry, manifest, and package metadata
 - `hooks/mempalace-session-save/` - internal hook for session snapshot saving
 - `docs/architecture.md` - high-level design notes
+- `docs/install.md` - install and config guide
 - `examples/config.example.json` - sample OpenClaw config
 
 ## Requirements
@@ -47,9 +48,17 @@ Recent improvements already in tree:
 
 See `examples/config.example.json`.
 
+## Install
+
+See `docs/install.md` for local installation, config, hook wiring, and verification steps.
+
 ## Development notes
 
 This implementation uses Python subprocess bridges instead of a direct Node adapter. That keeps the integration simple and portable, but it is not the final ideal architecture.
+
+## Changelog
+
+See `CHANGELOG.md`.
 
 ## License
 

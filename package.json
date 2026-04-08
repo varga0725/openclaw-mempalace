@@ -8,5 +8,15 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/varga0725/openclaw-mempalace.git"
-  }
+  },
+  "keywords": ["openclaw", "mempalace", "memory", "plugin", "hook"],
+  "files": [
+    "plugin",
+    "hooks",
+    "docs",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
 }

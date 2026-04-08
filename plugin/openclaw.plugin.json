@@ -1,17 +1,44 @@
 {
   "id": "mempalace",
   "name": "MemPalace OpenClaw Integration",
-  "description": "Generic MemPalace recall and relevance-based memory capture for OpenClaw",
+  "description": "MemPalace-based recall and long-term memory capture for OpenClaw",
+  "version": "0.1.0",
+  "kind": "memory",
+  "uiHints": {
+    "palacePath": {
+      "label": "Palace path",
+      "help": "Filesystem path to the MemPalace ChromaDB store",
+      "placeholder": "~/.mempalace/palace"
+    },
+    "maxRecallResults": {
+      "label": "Max recall results",
+      "help": "How many memory hits to inject into prompt context",
+      "advanced": true
+    },
+    "captureChannelScope": {
+      "label": "Capture scope",
+      "help": "Whether inbound capture runs only in direct chats or all channels"
+    },
+    "defaultWing": {
+      "label": "Default wing"
+    },
+    "defaultRoom": {
+      "label": "Default room"
+    }
+  },
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "enabled": { "type": "boolean" },
-      "palacePath": { "type": "string" },
-      "maxRecallResults": { "type": "number" },
-      "captureChannelScope": { "type": "string" },
-      "defaultWing": { "type": "string" },
-      "defaultRoom": { "type": "string" },
+      "palacePath": { "type": "string", "minLength": 1 },
+      "maxRecallResults": { "type": "integer", "minimum": 1, "maximum": 20 },
+      "captureChannelScope": {
+        "type": "string",
+        "enum": ["direct-only", "all"]
+      },
+      "defaultWing": { "type": "string", "minLength": 1 },
+      "defaultRoom": { "type": "string", "minLength": 1 },
       "routingRules": {
         "type": "array",
         "items": {
@@ -20,10 +47,11 @@
           "properties": {
             "matchAny": {
               "type": "array",
-              "items": { "type": "string" }
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
             },
-            "wing": { "type": "string" },
-            "room": { "type": "string" }
+            "wing": { "type": "string", "minLength": 1 },
+            "room": { "type": "string", "minLength": 1 }
           },
           "required": ["matchAny", "wing", "room"]
         }

@@ -6,7 +6,7 @@ metadata:
     "openclaw": {
       "emoji": "🏛️",
       "events": ["command:new", "command:reset"],
-      "requires": { "config": ["workspace.dir"] }
+      "requires": { "config": ["workspace.dir"], "bins": ["python3"] }
     }
   }
 ---
@@ -21,3 +21,4 @@ Config options under `hooks.internal.entries.mempalace-session-save`:
 - `messages`: number, default 15
 - `wing`: override wing name, default `openclaw_sessions`
 - `room`: override room name, default `session_memory`
+- `palacePath`: optional explicit palace path, defaults to `MEMPALACE_PALACE_PATH` or `~/.mempalace/palace`
