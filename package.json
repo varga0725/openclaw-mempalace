@@ -11,12 +11,24 @@
   },
   "keywords": ["openclaw", "mempalace", "memory", "plugin", "hook"],
   "files": [
-    "plugin",
+    "index.ts",
+    "openclaw.plugin.json",
     "hooks",
     "docs",
     "examples",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
-  ]
+  ],
+  "openclaw": {
+    "extensions": ["./index.ts"],
+    "compat": {
+      "pluginApi": ">=2026.3.24-beta.2",
+      "minGatewayVersion": ">=2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.3.24-beta.2",
+      "pluginSdkVersion": "2026.3.24-beta.2"
+    }
+  }
 }

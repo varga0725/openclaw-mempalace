@@ -3,7 +3,7 @@
 ## Local development install
 
 ```bash
-openclaw plugins install /absolute/path/to/openclaw-mempalace/plugin
+openclaw plugins install --link --dangerously-force-unsafe-install /absolute/path/to/openclaw-mempalace
 openclaw gateway restart
 ```
 
@@ -59,8 +59,9 @@ This repo also ships a standalone internal hook for saving recent session contex
 openclaw plugins list
 openclaw plugins inspect mempalace
 openclaw hooks list
-openclaw hooks info mempalace-session-save
 ```
+
+For the current install-status details and smoke-test checklist, see `docs/verification.md`.
 
 ## Notes
 

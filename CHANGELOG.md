@@ -10,3 +10,5 @@
 - official packaging prep: richer manifest, install docs, changelog
 - home-path expansion for palace paths like `~/.mempalace/palace`
 - first-pass duplicate suppression for plugin saves and session snapshot chunks
+- native plugin root layout at repository root for direct OpenClaw install
+- verification doc covering current unsafe-install blocker from Python subprocess bridging

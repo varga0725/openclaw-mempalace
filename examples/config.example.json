@@ -2,7 +2,7 @@
   "plugins": {
     "load": {
       "paths": [
-        "/absolute/path/to/openclaw-mempalace/plugin"
+        "/absolute/path/to/openclaw-mempalace"
       ]
     },
     "entries": {

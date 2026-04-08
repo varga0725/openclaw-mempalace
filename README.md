@@ -3,7 +3,7 @@
 MemPalace integration for OpenClaw.
 
 This repo packages two related pieces:
-- an OpenClaw plugin for MemPalace-based recall and inbound memory capture
+- a native OpenClaw plugin at the repository root for MemPalace-based recall and inbound memory capture
 - an internal hook that snapshots recent session context into MemPalace on `/new` and `/reset`
 
 ## Status
@@ -30,10 +30,11 @@ Recent improvements already in tree:
 
 ## Layout
 
-- `plugin/` - OpenClaw plugin entry, manifest, and package metadata
+- `index.ts` + `openclaw.plugin.json` - native OpenClaw plugin root
 - `hooks/mempalace-session-save/` - internal hook for session snapshot saving
 - `docs/architecture.md` - high-level design notes
 - `docs/install.md` - install and config guide
+- `docs/verification.md` - verification notes and current install-status caveats
 - `examples/config.example.json` - sample OpenClaw config
 
 ## Requirements
@@ -50,7 +51,8 @@ See `examples/config.example.json`.
 
 ## Install
 
-See `docs/install.md` for local installation, config, hook wiring, and verification steps.
+See `docs/install.md` for local installation and config.
+See `docs/verification.md` for smoke tests and the current unsafe-install caveat caused by the Python bridge.
 
 ## Development notes
 
